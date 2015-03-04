@@ -13,10 +13,26 @@
 # limitations under the License.
 
 import os
+import inspect
 
-def parse_readme():
-    readme_filename = os.path.join(os.path.dirname(__file__),
-                                   'README.md')
+FRAME = inspect.getouterframes(inspect.currentframe())[1]
+
+def _get_caller_module():
+    """Use inspection to get the module that *uses* simplesetup so
+    that we can refer to its README.md and so on. (Rather than
+    looking for that within simplesetup.)
+    """
+    return inspect.getmodule(FRAME[0])
+
+def _get_caller_dir():
+    caller_file = _get_caller_module().__file__
+    return os.path.dirname(caller_file)
+
+def _get_caller_name():
+    return _get_caller_module().__name__
+
+def _parse_readme():
+    readme_filename = os.path.join(_get_caller_dir(), 'README.md')
     with open(readme_filename, 'r') as f:
         readme = f.read()
 
@@ -28,7 +44,7 @@ def parse_readme():
               'reStructuredText failed...')
         pass
 
-def parse_requirements():
+def _parse_pip_requirements():
     try:
         from pip.req import parse_requirements
         parsed_reqs = parse_requirements('requirements.txt')
@@ -48,11 +64,15 @@ DEFAULT_CLASSIFICATION = [
 ]
 
 def setup(name, version, description, author, author_email,
-                url_prefix='https://github.com/hammerlab/',
-                license=('http://www.apache.org/licenses/'
-                         'LICENSE-2.0.html'),
-                classifiers=DEFAULT_CLASSIFICATION):
-    if __name__ == '__main__':
+          only_if_main=True,
+          url_prefix='https://github.com/hammerlab/',
+          license=('http://www.apache.org/licenses/'
+                   'LICENSE-2.0.html'),
+          classifiers=DEFAULT_CLASSIFICATION):
+    module = inspect.getmodule(FRAME[0])
+    caller_name = module.__name__
+    if ((only_if_main and caller_name == '__main__') or
+            not only_if_main):
         setuptools.setup(
             name=name,
             version=version,
@@ -62,7 +82,7 @@ def setup(name, version, description, author, author_email,
             url='%s%s' % (url_prefix, name),
             license=license,
             classifiers=classifiers,
-            install_requires=parse_requirements(),
-            long_description=parse_readme(),
+            install_requires=_parse_pip_requirements(),
+            long_description=_parse_readme(),
             packages=[name],
         )
