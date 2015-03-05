@@ -18,4 +18,6 @@ setup(name='simplesetup',
       version='0.0.0',
       description='Routines to simplify setup.py',
       author='Tavi Nathanson',
-      author_email='tavi {dot} nathanson {at} gmail {dot} com')
+      author_email='tavi {dot} nathanson {at} gmail {dot} com',
+      topic='Topic :: Software Development :: Libraries',
+      audience='Intended Audience :: Developers')

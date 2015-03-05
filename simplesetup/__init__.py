@@ -54,23 +54,22 @@ def _parse_pip_requirements():
 
 import setuptools
 
-DEFAULT_CLASSIFICATION = [
-    'Development Status :: 3 - Alpha',
-    'Environment :: Console',
-    'Operating System :: OS Independent',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: Apache Software License',
-    'Programming Language :: Python',
-]
-
 def setup(name, version, description, author, author_email,
+          status='Development Status :: 3 - Alpha',
+          environment='Environment :: Console',
+          os='Operating System :: OS Independent',
+          license='License :: OSI Approved :: Apache Software License',
+          language='Programming Language :: Python',
+          topic='Topic :: Scientific/Engineering :: Bio-Informatics',
+          audience='Intended Audience :: Science/Research',
           only_if_main=True,
           url_prefix='https://github.com/hammerlab/',
-          license=('http://www.apache.org/licenses/'
-                   'LICENSE-2.0.html'),
-          classifiers=DEFAULT_CLASSIFICATION):
+          license_url=('http://www.apache.org/licenses/'
+                       'LICENSE-2.0.html')):
     module = inspect.getmodule(FRAME[0])
     caller_name = module.__name__
+    classifiers = [status, environment, os, license, language,
+                   topic, audience]
     if ((only_if_main and caller_name == '__main__') or
             not only_if_main):
         setuptools.setup(
@@ -80,7 +79,7 @@ def setup(name, version, description, author, author_email,
             author=author,
             author_email=author_email,
             url='%s%s' % (url_prefix, name),
-            license=license,
+            license=license_url,
             classifiers=classifiers,
             install_requires=_parse_pip_requirements(),
             long_description=_parse_readme(),
